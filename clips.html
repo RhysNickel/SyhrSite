@@ -3,51 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Page Title</title>
-
-    <link rel="stylesheet" href="Styles.css">
+    <title>Steam Profile Viewer</title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
+    <link rel="stylesheet" href="Styles.css">
 </head>
 <body>
 
-    <div id="achievements">
-        <!-- Achievement data will be displayed here -->
-    </div>
+    <header>
+        <div class="container">
+            <h1>Syhr</h1>
+            <p class="tagline">Practice Website I spent hours on</p>
+        </div>
+    </header>
 
-    <script>
-        $(document).ready(function() {
-            var steamAPIKey = 'F11A630AFE1F58ADEAC65B3FE380C90C';
-            var steamUserID = '76561199365727898'; // Replace with the actual Steam user ID
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li class="active"><a href="clips.html">Clips</a></li>
+                
+            </ul>
+        </div>
+    </nav>
 
-            // Replace 'YOUR_STEAM_API_KEY' and 'STEAM_USER_ID' with your API key and user ID
-            var url = 'http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/' +
-                      '?appid=APP_ID&key=' + steamAPIKey + '&steamid=' + steamUserID;
+    <section id="steamProfile">
+        <div class="container">
+            
+        </div>
+    </section>
 
-            $.ajax({
-                url: url,
-                dataType: 'json',
-                success: function(data) {
-                    var achievementsDiv = $('#achievements');
 
-                    if (data.playerstats && data.playerstats.achievements) {
-                        var achievements = data.playerstats.achievements;
+<script>
+    // Replace 'YOUR_STEAM_API_KEY' with your actual Steam API key
+    const steamApiKey = 'F11A630AFE1F58ADEAC65B3FE380C90';
+    // Replace 'YOUR_STEAM_ID' with your actual Steam ID
+    const steamId = '76561199365727898';
 
-                        // Display achievements
-                        achievementsDiv.append('<h2>Achievements</h2>');
-                        for (var i = 0; i < achievements.length; i++) {
-                            achievementsDiv.append('<p>' + achievements[i].name + ': ' + achievements[i].achieved + '</p>');
-                        }
-                    } else {
-                        achievementsDiv.append('<p>No achievements found for this user.</p>');
-                    }
-                },
-                error: function() {
-                    $('#achievements').append('<p>Error loading data from Steam API.</p>');
+    const steamProfileUrl = `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${steamApiKey}&steamids=${steamId}`;
+
+    $(document).ready(function () {
+        // Fetch Steam profile data
+        $.ajax({
+            url: steamProfileUrl,
+            dataType: 'json',
+            success: function (data) {
+                if (data.response.players.length > 0) {
+                    const player = data.response.players[0];
+                    displaySteamProfile(player);
+                } else {
+                    $('#steamProfile').html('<p>Error retrieving Steam profile</p>');
                 }
-            });
+            },
+            error: function () {
+                $('#steamProfile').html('<p>Error retrieving Steam profile</p>');
+            }
         });
-    </script>
+    });
+
+    function displaySteamProfile(player) {
+        const html = `
+            <img src="${player.avatarfull}" alt="Steam Avatar">
+            <p>Steam ID: ${player.steamid}</p>
+            <p>Persona Name: ${player.personaname}</p>
+            <p>Profile URL: <a href="${player.profileurl}" target="_blank">${player.profileurl}</a></p>
+        `;
+        $('#steamProfile').html(html);
+    }
+</script>
 
 </body>
 </html>
